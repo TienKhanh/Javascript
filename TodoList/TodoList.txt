@@ -1,0 +1,127 @@
+const todo_list = document.querySelector(".todo-list");
+const todo_input = document.querySelector("#todo-input");
+const btn_add = document.querySelector("#btn-add");
+
+let isUpdate = false;
+let idUpdate = null;
+
+//id, title, status
+function createdId(){
+    let id = Math.floor(Math.random() * 100000);
+    return id
+}
+
+let todos = [
+    {
+        id: createdId(),
+        title:"Đi đá bóng",
+        status: true
+    },
+    {
+        id: createdId(),
+        title:"Làm bài tập",
+        status: false
+    },
+    {
+        id: createdId(),
+        title:"Học lập trình Java",
+        status: true
+    },
+];
+
+btn_add.addEventListener('click', function(){
+    let todoTitle = todo_input.value;
+    if(todoTitle == ''){
+        alert("Không được để trống");
+        return
+    }
+
+    if(isUpdate){
+        //Cập nhật
+        for(let i=0; i<todos.length; i++){
+            if(todos[i].id == idUpdate){
+                todos[i].title = todoTitle;
+            }
+        }
+        btn_add.innerText = "THÊM";
+        isUpdate = false;
+        idUpdate = null;
+    }else{
+        // Thêm mới
+        let newTodo = {
+            id : createdId(),
+            title: todo_input.value,
+            status: false
+        }
+    
+        todos.push(newTodo);
+    }
+
+    
+    renderUI(todos);
+    todo_input.value="";
+
+})
+
+function renderUI(arr){
+    todo_list.innerHTML = '';
+
+    if(arr.length == 0){
+        todo_list.innerHTML = "<p class='todos-empty'>Không có công việc nào trong danh sách</p>"
+    }
+
+    for(let i = 0; i<arr.length; i++){
+        const t = arr[i]
+        todo_list.innerHTML += `
+            <div class="todo-item ${t.status ? 'active-todo':''}">
+                <div class="todo-item-title">
+                    <input type="checkbox" ${t.status ? 'checked':''} onClick="toggleStatus(${t.id})">
+                    <p>${t.title}</p>
+                </div>
+                <div class="option">
+                    <button class="btn btn-update" onClick="updateTodo(${t.id})">
+                        <img src="https://buihien0109.github.io/HTML5-Games/DOM-project/todo/img/pencil.svg" alt="icon">
+                    </button>
+                    <button class="btn btn-delete" onClick="deleteTodo(${t.id})">
+                        <img src="https://buihien0109.github.io/HTML5-Games/DOM-project/todo/img/remove.svg" alt="icon">
+                    </button>
+                </div>
+            </div>
+        `
+    }
+}
+
+function deleteTodo(id){
+    for(let i=0;i<todos.length;i++){
+        if(todos[i].id==id){
+            todos.splice(i,1);
+        }
+    }
+    renderUI(todos)
+
+}
+function toggleStatus(id){
+    for(let i= 0; i<todos.length;i++ ){
+        if(todos[i].id==id){
+            todos[i].status = !todos[i].status;
+        }
+    }
+    renderUI(todos)
+}
+
+function updateTodo(id){
+    let title
+    for(let i= 0; i<todos.length;i++ ){
+        if(todos[i].id==id){
+            title = todos[i].title
+        }
+    }
+    todo_input.value = title;
+    todo_input.focus();
+
+    btn_add.innerText = "CẬP NHẬT";
+    isUpdate = true;
+    idUpdate = id;
+
+}
+renderUI(todos)
